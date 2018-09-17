@@ -52,6 +52,8 @@ public class RandomGuessPlayer implements Player{
     public Guess makeGuess() {
         Guess newGuess = new Guess();
         
+        //generates random integer between the 2 values.
+        //so between rowLimit and 0;
         newGuess.row = random.nextInt(rowLimit - 0 + 1) + 0;
         newGuess.column = random.nextInt(columnLimit - 0 + 1) + 0;
         
@@ -62,6 +64,10 @@ public class RandomGuessPlayer implements Player{
     @Override
     public void update(Guess guess, Answer answer) {
         // To be implemented.
+    	
+    	//I think this would be where we update shots and ship hits etc
+    	//cause we get the enemy guess and the answer?
+    	
     } // end of update()
 
 
@@ -69,6 +75,9 @@ public class RandomGuessPlayer implements Player{
     public boolean noRemainingShips() {
         // To be implemented.
 
+    	//so i guess this runs through ship locations and shots
+    	//and counts how many ships left?
+    	
         // dummy return
         return true;
     } // end of noRemainingShips()
