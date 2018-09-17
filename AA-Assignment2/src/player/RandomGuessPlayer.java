@@ -1,7 +1,11 @@
 package player;
 
+import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 import world.World;
+import world.World.Coordinate;
+import world.World.ShipLocation;
 
 /**
  * Random guess player (task A).
@@ -10,27 +14,48 @@ import world.World;
  * @author Youhan Xia, Jeffrey Chan
  */
 public class RandomGuessPlayer implements Player{
-
+	//the boundaries of the world;
+	int rowLimit;
+	int columnLimit;
+	
+	// Ship locations and shot history.
+    public ArrayList<ShipLocation> shipLocations;
+    public ArrayList<Coordinate> shots;
+	
+	//entire world - Maybe remove this and only have ships, shots etc.
+	World myWorld;
+	
+	
+	Random random = new Random();
+	
     @Override
     public void initialisePlayer(World world) {
-        // To be implemented.
+       this.columnLimit = world.numColumn;
+       this.rowLimit = world.numRow;
+       
+       this.shipLocations = world.shipLocations;
+       this.shots = world.shots;
+       
+       myWorld = world;
     } // end of initialisePlayer()
 
     @Override
     public Answer getAnswer(Guess guess) {
-        // To be implemented.
-
-        // dummy return
-        return null;
+       Answer newAnswer = new Answer();
+       newAnswer.isHit = myWorld.updateShot(guess);
+    	
+       return null;
     } // end of getAnswer()
 
 
     @Override
     public Guess makeGuess() {
-        // To be implemented.
-
-        // dummy return
-        return null;
+        Guess newGuess = new Guess();
+        
+        newGuess.row = random.nextInt(rowLimit - 0 + 1) + 0;
+        newGuess.column = random.nextInt(columnLimit - 0 + 1) + 0;
+        
+        return newGuess;
     } // end of makeGuess()
 
 
