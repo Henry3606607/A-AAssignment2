@@ -221,7 +221,7 @@ public class World {
 
         } else {
             if (offset ==0) {
-                StdDraw.setCanvasSize(1800, 900);
+                StdDraw.setCanvasSize(1366, 768);
                 StdDraw.setXscale(-1, 2*(numColumn+1));
                 StdDraw.setYscale(-1, numRow+1);
             }

@@ -34,14 +34,16 @@ public class RandomGuessPlayer implements Player{
 	
     @Override
     public void initialisePlayer(World world) {
-       this.columnLimit = world.numColumn;
-       this.rowLimit = world.numRow;
+       this.columnLimit = world.numColumn - 1;
+       this.rowLimit = world.numRow - 1;
 
        //Initiate the new class shipStatus for each ship
        for(ShipLocation location : world.shipLocations){
     	   ShipStatus status = new ShipStatus();
     	   status.shipLocation = location;
+    	   System.out.println("ship: "+location.ship.name()+" len: "+location.ship.len()+" widht:"+location.ship.width());
     	   status.health = location.ship.len() * location.ship.width();
+    	   System.out.println("health: "+ status.health);
     	   shipStatusList.add(status);
        }
        
@@ -53,8 +55,21 @@ public class RandomGuessPlayer implements Player{
     @Override
     public Answer getAnswer(Guess guess) {
        Answer newAnswer = new Answer();
-       newAnswer.isHit = myWorld.updateShot(guess);
-       update(guess, newAnswer);
+       newAnswer.isHit = false;
+       
+       for(ShipStatus status : shipStatusList) {
+    	   ArrayList<Coordinate> coordinates = status.shipLocation.coordinates;
+	   		for(Coordinate coordinate : coordinates) {
+	   			if(coordinate.column == guess.column && coordinate.row == guess.row) {
+	   				newAnswer.isHit = true;
+	   				if(status.health == 1) {
+	   					newAnswer.shipSunk = status.shipLocation.ship;
+	   				}
+	   				return newAnswer;
+	   			}
+	   		}
+       }
+       
        return newAnswer;
     } // end of getAnswer()
 
@@ -76,7 +91,7 @@ public class RandomGuessPlayer implements Player{
 	        	}
 	        }
         }
-        System.out.println("Row: " + newGuess.row + "Column: " + newGuess.column);
+        
         myGuessList.add(newGuess);
         return newGuess;
     } // end of makeGuess()
@@ -88,16 +103,15 @@ public class RandomGuessPlayer implements Player{
     	
     	//I think this would be where we update shots and ship hits etc
     	//cause we get the enemy guess and the answer?
-
     	for(ShipStatus status : shipStatusList) {
     		ArrayList<Coordinate> coordinates = status.shipLocation.coordinates;
     		for(Coordinate coordinate : coordinates) {
     			if(coordinate.column == guess.column && coordinate.row == guess.row) {
     				status.health--;
-    				status.toString();
     				System.out.println("health reduced to: " + status.health);
     				if(status.health <= 0 ) {
     					shipStatusList.remove(status);
+    					System.out.println("Ship destroyed: " + status.shipLocation.ship.name());
     				}
     				return;
     			}
@@ -109,18 +123,19 @@ public class RandomGuessPlayer implements Player{
     private class ShipStatus {
     	ShipLocation shipLocation;
     	int health; 
+    	boolean destroyed = false;
     }
 
 
     @Override
     public boolean noRemainingShips() {
         // To be implemented.
-
+    	
     	if(shipStatusList.isEmpty()) {
     		return true;
     	}
+    	System.out.println("No of ships left: "+shipStatusList.size());
     	
-        // dummy return
         return false;
     } // end of noRemainingShips()
 
