@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 import ship.Ship;
+import ship.ShipStatus;
 import world.World;
 import world.World.Coordinate;
 import world.World.ShipLocation;
@@ -22,13 +23,8 @@ public class RandomGuessPlayer implements Player{
 	int shipsRemaining;
 	
 	// Ship locations and shot history.
-    public ArrayList<Coordinate> shots;
     public ArrayList<Guess> myGuessList = new ArrayList<>();
     public ArrayList<ShipStatus> shipStatusList = new ArrayList<>();
-	
-	//entire world - Maybe remove this and only have ships, shots etc.
-	World myWorld;
-	
 	
 	Random random = new Random();
 	
@@ -47,9 +43,6 @@ public class RandomGuessPlayer implements Player{
     	   shipStatusList.add(status);
        }
        
-       this.shots = world.shots;
-       
-       myWorld = world;
     } // end of initialisePlayer()
 
     @Override
@@ -58,18 +51,19 @@ public class RandomGuessPlayer implements Player{
        newAnswer.isHit = false;
        
        for(ShipStatus status : shipStatusList) {
-    	   ArrayList<Coordinate> coordinates = status.shipLocation.coordinates;
-	   		for(Coordinate coordinate : coordinates) {
-	   			if(coordinate.column == guess.column && coordinate.row == guess.row) {
-	   				newAnswer.isHit = true;
-	   				if(status.health == 1) {
-	   					newAnswer.shipSunk = status.shipLocation.ship;
-	   				}
-	   				return newAnswer;
-	   			}
-	   		}
-       }
-       
+   		ArrayList<Coordinate> coordinates = status.shipLocation.coordinates;
+   		for(Coordinate coordinate : coordinates) {
+   			if(coordinate.column == guess.column && coordinate.row == guess.row) {
+   				status.health--;
+   				if(status.health <= 0 ) {
+   					newAnswer.shipSunk = status.shipLocation.ship;
+   					shipStatusList.remove(status);
+   				}
+   				newAnswer.isHit = true;
+   				return newAnswer;
+   			}
+   		}
+   	}
        return newAnswer;
     } // end of getAnswer()
 
@@ -101,30 +95,11 @@ public class RandomGuessPlayer implements Player{
     public void update(Guess guess, Answer answer) {
         // To be implemented.
     	
-    	//I think this would be where we update shots and ship hits etc
-    	//cause we get the enemy guess and the answer?
-    	for(ShipStatus status : shipStatusList) {
-    		ArrayList<Coordinate> coordinates = status.shipLocation.coordinates;
-    		for(Coordinate coordinate : coordinates) {
-    			if(coordinate.column == guess.column && coordinate.row == guess.row) {
-    				status.health--;
-    				System.out.println("health reduced to: " + status.health);
-    				if(status.health <= 0 ) {
-    					shipStatusList.remove(status);
-    					System.out.println("Ship destroyed: " + status.shipLocation.ship.name());
-    				}
-    				return;
-    			}
-    		}
-    	}
+    	
     	
     } // end of update()
     
-    private class ShipStatus {
-    	ShipLocation shipLocation;
-    	int health; 
-    	boolean destroyed = false;
-    }
+    
 
 
     @Override
