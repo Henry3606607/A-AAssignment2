@@ -34,19 +34,19 @@ public class GreedyGuessPlayer  implements Player
     @Override
     public void initialisePlayer(World world)
     {
-	this.columnLimit = world.numColumn - 1;
-	this.rowLimit = world.numRow - 1;
-
-	//Initiate the new class shipStatus for each ship
-	for(ShipLocation location : world.shipLocations)
-	    {
-		ShipStatus status = new ShipStatus();
-		status.shipLocation = location;
-		System.out.println("ship: "+location.ship.name()+" len: "+location.ship.len()+" widht:"+location.ship.width());
-		status.health = location.ship.len() * location.ship.width();
-		System.out.println("health: "+ status.health);
-		shipStatuses.add(status);
-	    }
+		this.columnLimit = world.numColumn - 1;
+		this.rowLimit = world.numRow - 1;
+	
+		//Initiate the new class shipStatus for each ship
+		for(ShipLocation location : world.shipLocations)
+		    {
+			ShipStatus status = new ShipStatus();
+			status.shipLocation = location;
+			System.out.println("ship: "+location.ship.name()+" len: "+location.ship.len()+" widht:"+location.ship.width());
+			status.health = location.ship.len() * location.ship.width();
+			System.out.println("health: "+ status.health);
+			shipStatuses.add(status);
+		    }
     }  // end of initialisePlayer()
 
     // Return Answer object with .isHit set to true if the guess has hit one of our ships
@@ -56,36 +56,32 @@ public class GreedyGuessPlayer  implements Player
     	Answer newAnswer = new Answer();
         newAnswer.isHit = false;
         
-        for(ShipStatus status : shipStatuses)
-	    {
-		ArrayList<Coordinate> coordinates = status.shipLocation.coordinates;
-		for(Coordinate coordinate : coordinates)
-		    {
-			if(coordinate.column == guess.column && coordinate.row == guess.row)
-			    {	// One of our ships has been hit :'(
-				status.health--;
-				if(status.health <= 0 )
-				    {
-					newAnswer.shipSunk = status.shipLocation.ship;
-					shipStatuses.remove(status);
-				    }
-				newAnswer.isHit = true;
-				return newAnswer;
-			    }
-		    }
+        for(ShipStatus status : shipStatuses){
+			for(Coordinate coordinate : status.shipLocation.coordinates){
+				if(coordinate.column == guess.column && coordinate.row == guess.row) {	
+					// One of our ships has been hit :'(
+					status.health--;
+					if(status.health <= 0 ){
+						newAnswer.shipSunk = status.shipLocation.ship;
+						shipStatuses.remove(status);
+					}
+					newAnswer.isHit = true;
+					return newAnswer;
+				}
+			}
 	    }
         return newAnswer;
     } // end of getAnswer()
 
 
-    static int check = 0;//Maintain next position to check
     @Override
     public Guess makeGuess()
     {
+    	int check = 0;//Maintain next position to check
     	Guess newGuess = new Guess();
         
         boolean added = false;
-        if(isHunting)
+        if(isHunting || lastSuccessfullGuess.isEmpty())
 	    {			// make random guess alligned on checkerboard pattern
 	        while(!added)
 		    {
@@ -95,15 +91,13 @@ public class GreedyGuessPlayer  implements Player
 			added = isUniqueGuess(newGuess);
 		    }
 	    }
-	else
-	    {			// we hit a ship and now much make a more refined guess
+        else{			// we hit a ship and now much make a more refined guess
 	    	do
 		    {
-			System.out.println("check = " + check + "\nnewGuess.row = " + newGuess.row + ", newGuess.column " + newGuess.column);
 			newGuess.row = lastSuccessfullGuess.peek().row;
 			newGuess.column = lastSuccessfullGuess.peek().column;
 			switch(check) // :)
-			    {//new position (n), old position (o)
+		    {//new position (n), old position (o)
 			    case 0:
 				--newGuess.row;		//no
 				break;
@@ -116,31 +110,35 @@ public class GreedyGuessPlayer  implements Player
 			    case 3:			//o
 				--newGuess.column;	//n
 				break;
-			    }
+		    }
 			if(isUniqueGuess(newGuess) && !outOfBounds(newGuess))
-			    {
+		    {
 				++check;
 				break;
-			    }
+		    }
 			else
 			    {
 				++check;
-				if(check == 4)
-				    {
+				if(check == 4){
 					break;
-				    }
+				}
 			    }
 		    }while(true);		
-		if(check == 4)
-		    {
-			check = 0;
-			lastSuccessfullGuess.pop();
-			if(lastSuccessfullGuess.empty() == true)
-			    isHunting = true;
+			if(check == 4){
+				check = 0;
+				lastSuccessfullGuess.pop();
+				if(lastSuccessfullGuess.empty() == true) {
+				    isHunting = true;
+				}
+				while(!added) {
+		        	added = true;
+		        	//generic greedy guess
+					getRandomGuess(newGuess);
+					added = isUniqueGuess(newGuess);
+				}
 		    }
-		System.out.println("newGuess.row = " + newGuess.row + ", newGuess.column " + newGuess.column + "\n");
-		//Scanner sc = new Scanner(System.in);
-		//int i = sc.nextInt();
+			//Scanner sc = new Scanner(System.in);
+			//int i = sc.nextInt();
 	    }
         
         previousGuesses.add(newGuess);
@@ -199,7 +197,12 @@ public class GreedyGuessPlayer  implements Player
     	if(answer.isHit)
 	    {
 		System.out.println("is a hit");
-		lastSuccessfullGuess.push(guess);
+		if(answer.shipSunk != null) {
+			lastSuccessfullGuess.clear();
+		}
+		else{
+			lastSuccessfullGuess.push(guess);
+		}
 		isHunting = false;
 	    }
 	else

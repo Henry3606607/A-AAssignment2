@@ -46,25 +46,26 @@ public class RandomGuessPlayer implements Player{
     } // end of initialisePlayer()
 
     @Override
-    public Answer getAnswer(Guess guess) {
-       Answer newAnswer = new Answer();
-       newAnswer.isHit = false;
-       
-       for(ShipStatus status : shipStatusList) {
-   		ArrayList<Coordinate> coordinates = status.shipLocation.coordinates;
-   		for(Coordinate coordinate : coordinates) {
-   			if(coordinate.column == guess.column && coordinate.row == guess.row) {
-   				status.health--;
-   				if(status.health <= 0 ) {
-   					newAnswer.shipSunk = status.shipLocation.ship;
-   					shipStatusList.remove(status);
-   				}
-   				newAnswer.isHit = true;
-   				return newAnswer;
-   			}
-   		}
-   	}
-       return newAnswer;
+    public Answer getAnswer(Guess guess)
+    {
+    	Answer newAnswer = new Answer();
+        newAnswer.isHit = false;
+        
+        for(ShipStatus status : shipStatusList){
+			for(Coordinate coordinate : status.shipLocation.coordinates){
+				if(coordinate.column == guess.column && coordinate.row == guess.row) {	
+					// One of our ships has been hit :'(
+					status.health--;
+					if(status.health <= 0 ){
+						newAnswer.shipSunk = status.shipLocation.ship;
+						shipStatusList.remove(status);
+					}
+					newAnswer.isHit = true;
+					return newAnswer;
+				}
+			}
+	    }
+        return newAnswer;
     } // end of getAnswer()
 
 

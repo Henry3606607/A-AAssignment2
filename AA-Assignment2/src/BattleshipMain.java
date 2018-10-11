@@ -132,6 +132,7 @@ public class BattleshipMain {
                     if (!p2HasNoShipsLeft) {
                         // player 1 makes a guess
                         Guess guess = p1.makeGuess();
+                        System.out.println("Player 1:" +"\nnewGuess.row = " + guess.row + ", newGuess.column " + guess.column);
                         if (logWriter != null) {
                             logWriter.println("Player 1 " + guess);
                         }
@@ -164,6 +165,7 @@ public class BattleshipMain {
                     if (!p1HasNoShipsLeft) {
                         // player 2 makes a guess
                         Guess guess = p2.makeGuess();
+                        System.out.println("Player 2:" +"\nnewGuess.row = " + guess.row + ", newGuess.column " + guess.column);
                         if (logWriter != null) {
                             logWriter.println("Player 2 " + guess);
                         }
