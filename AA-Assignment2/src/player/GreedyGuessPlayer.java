@@ -23,8 +23,9 @@ public class GreedyGuessPlayer  implements Player{
 	
 	// Ship locations and shot history.
     public ArrayList<Guess> myGuessList = new ArrayList<>();
-    public ArrayList<Guess> mySuccessGuessList = new ArrayList<>();
     public ArrayList<ShipStatus> shipStatusList = new ArrayList<>();
+    
+    Guess lastHit;
 	
 	Random random = new Random();
 	
@@ -72,7 +73,7 @@ public class GreedyGuessPlayer  implements Player{
     	Guess newGuess = new Guess();
         
         boolean added = false;
-        if(mySuccessGuessList.isEmpty()) {
+        if(lastHit == null) {
 	        while(!added){
 	        	added = true;
 	        	//generic greedy guess
@@ -93,21 +94,15 @@ public class GreedyGuessPlayer  implements Player{
 	    else {
 	    	//get the most recent guess
 	    	do {
-		    	newGuess = mySuccessGuessList.get(mySuccessGuessList.size() - 1);
-		    	if(mySuccessGuessList.size() == 1) {
-		    		//if first hit make a random guess
-			    	int direction = random.nextInt(4 - 0 + 1) + 0;
-			    	switch(direction) {
-			    		case 1: newGuess.row += 1;
-			    		case 2: newGuess.row -= 1;
-			    		case 3: newGuess.column += 1;
-			    		case 4: newGuess.column -= 1;
-			    	}
-		    	}
-		    	else {
-		    		for(Guess hit : mySuccessGuessList) {
-		    			
-		    		}
+		    	newGuess = lastHit;
+		    	//if first hit make a random guess
+		    	int direction = random.nextInt(4 - 0 + 1) + 0;
+		    	System.out.println("direction val= "+direction);
+		    	switch(direction) {
+		    		case 1: newGuess.row += 1;
+		    		case 2: newGuess.row -= 1;
+		    		case 3: newGuess.column += 1;
+		    		case 4: newGuess.column -= 1;
 		    	}
 	    	}while(isUniqueGuess(newGuess));
 	    }
@@ -118,6 +113,9 @@ public class GreedyGuessPlayer  implements Player{
     
     public boolean isUniqueGuess(Guess newGuess) {
     	//make sure I havent done this guess already
+    	if(newGuess.row > 9 || newGuess.row < 0 && newGuess.column > 9 || newGuess.column < 0) {
+    		return false;
+    	}
         for(Guess guess : myGuessList) {
         	if(newGuess.row == guess.row && newGuess.column == guess.column) {
         		return false;
@@ -132,9 +130,9 @@ public class GreedyGuessPlayer  implements Player{
     	//my guess, other answer
     	if(answer.isHit) {
     		System.out.println("is a hit");
-    		mySuccessGuessList.add(guess);
+    		lastHit = guess;
     		if(answer.shipSunk != null) {
-    			mySuccessGuessList.clear();
+    			lastHit = null;
     		}
     	}
     	
