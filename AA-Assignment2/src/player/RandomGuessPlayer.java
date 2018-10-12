@@ -17,6 +17,12 @@ import world.World.ShipLocation;
  * @author Youhan Xia, Jeffrey Chan
  */
 public class RandomGuessPlayer implements Player{
+	
+	/*random guess player takes random guessess on any 
+	square on the map. Doesn't care if it hits or not
+	is very dumb and shoots blindly.*/
+	
+	
 	//the boundaries of the world;
 	int rowLimit;
 	int columnLimit;

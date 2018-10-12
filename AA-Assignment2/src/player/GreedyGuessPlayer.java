@@ -18,6 +18,11 @@ import world.World.ShipLocation;
  */
 public class GreedyGuessPlayer  implements Player
 {
+	/*Greedy guess player shoots at every second square
+	until it gets a hit. Once it gets a hit it shoots around the 
+	hit, until the entire ship is destroyed.
+	Greedy guesser isnt very smart, just shoots to
+	cover as much ground as possible.*/
 
     int rowLimit;
     int columnLimit;
